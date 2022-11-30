@@ -1,5 +1,4 @@
 import os
-os.environ['PYTHONASYNCIODEBUG'] = '1'
 import asyncio
 import sys
 import curses
@@ -9,8 +8,6 @@ import abc
 import logging
 import enum
 import traceback
-
-logging.basicConfig(filename='log.txt', level=logging.DEBUG)
 
 class InputManager:
     def __init__(self, window: curses.window, queue: asyncio.Queue | None = None) -> None:
@@ -772,13 +769,10 @@ async def main(stdscr: curses.window):
 
     lines, cols = curses.LINES, curses.COLS
 
-    userlen = min(30, cols//3)
-    textbox = TextBox(0, 0, cols - userlen, lines-3, 1000)
-    userlist = TextBox(cols-userlen, 0, userlen, lines-3, 100)
+    textbox = TextBox(0, 0, cols, lines-3, 1000)
     inputbox = InputBox(0, lines-3, cols)
 
     app.add_widget(textbox, z=1)
-    app.add_widget(userlist, z=2)
     app.add_widget(inputbox, z=3)
     app.focus_input(inputbox)
 
@@ -801,10 +795,8 @@ async def main(stdscr: curses.window):
 
     @app.resize
     def resize(lines, cols):
-        userlen = min(30, cols//3)
-        textbox.set_geometry((0, 0, cols-userlen, lines-3))
+        textbox.set_geometry((0, 0, cols, lines-3))
         inputbox.set_geometry((0, lines-3, cols, 3))
-        userlist.set_geometry((cols-userlen, 0, userlen, lines-3))
 
     await client.connect(sys.argv[1], sys.argv[2])
 
